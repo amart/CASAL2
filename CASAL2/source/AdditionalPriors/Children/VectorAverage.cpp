@@ -99,9 +99,11 @@ Double VectorAverage::GetScore() {
   Double score = 0.0;
 
   if (method_ == PARAM_K) {
-    for (Double value : values)
+    for (Double value : values) {
       score += value;
-    score = score / values.size();
+      LOG_FINEST() << value;
+    }
+    score = score / (Double)values.size();
 
     score = (score - k_) * (score - k_);
 
@@ -122,6 +124,7 @@ Double VectorAverage::GetScore() {
   } else
     LOG_CODE_ERROR() << "Unknown Method: " << method_;
 
+  LOG_FINEST() << "score = " << score;
   return score * multiplier_;
 }
 

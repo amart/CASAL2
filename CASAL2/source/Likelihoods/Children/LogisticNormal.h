@@ -10,6 +10,9 @@
 
 #include "Likelihoods/Likelihood.h"
 #include <boost/numeric/ublas/matrix.hpp>
+#include <boost/numeric/ublas/lu.hpp>
+#include <boost/numeric/ublas/io.hpp>
+#include <boost/numeric/ublas/storage.hpp>
 
 namespace niwa {
 namespace likelihoods {
@@ -33,20 +36,25 @@ protected:
   vector<unsigned>            bins_;
   vector<Double>              rho_;
   bool                        arma_;
+  bool                        robust_;
   unsigned                    n_bins_;
   bool                        sep_by_sex_;
+  bool                        sex_lag_;
   bool                        sexed_;
-
+  unsigned                    unique_bins_;
 
   // Covariance containers
   ublas::matrix<Double>       covariance_matrix_;
   ublas::matrix<Double>       covariance_matrix_lt;
   parameters::Table*          covariance_table_ = nullptr;
   // Methods
-  void                        calculate_covariance(Double sigma_, vector<Double> rho_, unsigned N_ages, bool sepbysex, bool ARMA, bool sexed);
+  void                        calculate_covariance();
   vector<Double>              GetRho(vector<Double>& Phi, unsigned nBin, bool ARMA);
   vector<Double>              RecursiveFilter(vector<Double>& ar_coef, unsigned nBins, vector<Double>& initial_vals);
   bool                        DoCholeskyDecmposition();
+  bool                        InvertMatrix(const ublas::matrix<Double>& input, ublas::matrix<Double>& inverse);
+  Double                      det_fast(const ublas::matrix<Double>& matrix);
+
 
 };
 

@@ -31,9 +31,18 @@ void DerivedQuantity::DoExecute() {
   cache_ << "*" << label_ << " " << "("<< type_ << ")"<<"\n";
 
   auto derived_quantities = manager.objects();
+  bool multiple_derived_blocks = false;
+
+  if(derived_quantities.size() > 1)
+      multiple_derived_blocks = true;
+
   for (auto dq : derived_quantities) {
     string label =  dq->label();
-    cache_ << label << " " << REPORT_R_LIST <<" \n";
+    if (multiple_derived_blocks)
+      cache_ << label << " " << REPORT_R_LIST <<" \n";
+    else
+      cache_ << "label: " << label << " \n";
+
     cache_ << "derived_type: " << dq->type() << " \n";
     // report b0 and binitial
     if (model_->b0(label) > 0)
@@ -65,7 +74,8 @@ void DerivedQuantity::DoExecute() {
         cache_ << iter->first << " " << iter->second << "\n";
     }
     //cache_ <<"\n";
-    cache_ << REPORT_R_LIST_END <<" \n";
+    if (multiple_derived_blocks)
+      cache_ << REPORT_R_LIST_END <<"\n";
 
   }
 

@@ -404,15 +404,13 @@ void Model::RunBasic() {
         }
         estimable_targets.push_back(target);
       }
-
-
     }
 
     timesteps::Manager& time_step_manager = *managers_->time_step();
     timevarying::Manager& time_varying_manager = *managers_->time_varying();
-    for (current_year_ = start_year_; current_year_ <= final_year_; ++current_year_) {
+    for (current_year_ = start_year_; current_year_ <= projection_final_year_; ++current_year_) {
       LOG_FINE() << "Iteration year: " << current_year_;
-      if (single_step) {
+      if (single_step && current_year_ > final_year_) { // Only allow single step to execute between final_year - final_projection_year i.e only single step for projections.
         managers_->report()->Pause();
         cout << "Please enter space separated values for estimables for year: " << current_year_ << endl;
         string line = "";

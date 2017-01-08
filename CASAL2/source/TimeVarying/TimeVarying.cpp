@@ -130,6 +130,7 @@ void TimeVarying::set_map_value(Double value) {
  *
  */
 void TimeVarying::Reset() {
+  DoReset();
   string error = "";
   Estimable::Type estimable_type = model_->objects().GetEstimableType(parameter_, error);
   if (estimable_type == Estimable::kSingle) {

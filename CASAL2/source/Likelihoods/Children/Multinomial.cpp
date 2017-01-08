@@ -92,23 +92,22 @@ void Multinomial::SimulateObserved(map<unsigned, vector<observations::Comparison
   for (; iterator != comparisons.end(); ++iterator) {
     LOG_FINE() << "Simulating values for year: " << iterator->first;
 
-//    map<string, Double> totals;
+    Double Total = 0.0;
     for (observations::Comparison& comparison : iterator->second) {
       Double error_value = AdjustErrorValue(comparison.process_error_, comparison.error_value_);
 
       if (comparison.expected_ <= 0.0 || error_value <= 0.0)
         comparison.observed_ = 0.0;
       else {
-        LOG_FINEST() << "expected = " << comparison.expected_;
         comparison.observed_ = rng.binomial(AS_DOUBLE(comparison.expected_), AS_DOUBLE(error_value));
-        LOG_FINEST() << "Simulated = " << comparison.observed_;
-
       }
-//      totals[comparison.category_] += comparison.observed_;
+      Total += comparison.observed_;
     }
-
-//    for (observations::Comparison& comparison : iterator->second)
-//      comparison.observed_ /= totals[comparison.category_];
+    // Convert numbers at age (which is what is generated here) to proportions at age
+    for (observations::Comparison& comparison : iterator->second) {
+      comparison.observed_ /= Total;
+      LOG_FINEST() << "expected = " << comparison.expected_ << " simulated = " << comparison.observed_ << " age = " << comparison.age_ << " category = " << comparison.category_ << " error = " << comparison.error_value_ ;
+    }
   }
 }
 

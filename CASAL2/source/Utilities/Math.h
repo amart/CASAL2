@@ -110,6 +110,24 @@ inline Double unscale_value(const Double& value, Double& penalty, Double min, Do
 //**********************************************************************
 //    General math utilities
 //**********************************************************************
+
+// Calculate the Sum of a vector
+inline Double Sum(vector<Double> x) {
+  Double Total = 0.0;
+    for (unsigned i = 0; i< x.size(); ++i) {
+     Total += x[i];
+    }
+    return Total;
+}
+// Check if a vecotr contains all ones
+inline bool all_ones(vector<Double> x) {
+  for(auto num : x) {
+    if (num != 1.0)
+      return false;
+  }
+  return true;
+}
+
 // Return the mean for a vector
 inline Double mean(const vector<Double>& Values){
   Double mu = 0.0;
@@ -182,7 +200,28 @@ inline Double Max(const vector<Double>& Values){
   return max;
 }
 
+// Return the row index and column index of a matrix given an index. This follows R functionality.
+// Assumes the index follows byrow = T.
+inline vector<int> get_mat_index(int rows, int cols, double index) {
+  //unsigned  row_index, col_index;
+  vector<int> result;
+  int row_ind= floor(index / rows);
+  int col_index = index - (row_ind * cols);
+  result.push_back(row_ind);
+  result.push_back(col_index);
+  return result;
+}
 
+// Calculate the Sum of a vector
+inline vector<Double> elem_prod(vector<Double>& x,vector<Double>& y) {
+  if(x.size() != y.size())
+    LOG_FATAL() << "method  elem_prod() can only work for equal length vectors";
+  vector<Double> elem_prod(y.size(),0.0);
+    for (unsigned i = 0; i< x.size(); ++i) {
+      elem_prod[i] = x[i] * y[i];
+    }
+    return elem_prod;
+}
 
 } /* namespace math */
 } /* namespace utilities */

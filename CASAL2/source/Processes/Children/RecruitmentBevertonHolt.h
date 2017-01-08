@@ -40,7 +40,9 @@ public:
   //accessor
   unsigned                    ssb_offset() {return ssb_offset_;};
   string                      ssb_label() {return ssb_;};
+  //Used in Inisialisation
   bool                        bo_initialised() {return bo_initialised_;};
+  map<unsigned, Double>&      true_ycs() {return true_ycs_;};
 
 
 private:
@@ -67,6 +69,8 @@ private:
   vector<unsigned>            standardise_ycs_;
   DerivedQuantity*            derived_quantity_ = nullptr;
   bool                        prior_ycs_values_ = true;
+  // Used in reporting
+  map<unsigned, Double>       true_ycs_;
 };
 
 } /* namespace processes */

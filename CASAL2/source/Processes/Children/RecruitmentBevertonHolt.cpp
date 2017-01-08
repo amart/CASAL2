@@ -31,9 +31,7 @@ namespace math = niwa::utilities::math;
 /**
  * default constructor
  */
-RecruitmentBevertonHolt::RecruitmentBevertonHolt(Model* model)
-  : Process(model),
-    partition_(model) {
+RecruitmentBevertonHolt::RecruitmentBevertonHolt(Model* model) : Process(model), partition_(model) {
   LOG_TRACE();
 
   parameters_.Bind<string>(PARAM_CATEGORIES, &category_labels_, "Category labels", "");
@@ -336,8 +334,11 @@ void RecruitmentBevertonHolt::DoExecute() {
         << true_ycs << "; amount_per = " << amount_per;
     }
     // Store true_ycs values
-    StoreForReport("YCS_year: " , model_->current_year() - ssb_offset_);
-    StoreForReport("true_ycs: " , true_ycs);
+    // check for report type is finalise
+    true_ycs_[model_->current_year() - ssb_offset_] = true_ycs;
+    // I swapped the above method for this. CHG because when smode -e it keeped being pushed back and getting large reports.
+    //StoreForReport("YCS_year: " , model_->current_year() - ssb_offset_);
+    //StoreForReport("true_ycs: " , true_ycs);
 
 
   }

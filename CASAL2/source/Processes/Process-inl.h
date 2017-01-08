@@ -57,7 +57,7 @@ void Process::StoreForReport(const string& label, const vector<T>& values) {
   string svalue = "";
   for (auto value : values) {
     svalue = utilities::ToInline<T, string>(value);
-    print_values_[label].push_back(values);
+    print_values_[label].push_back(svalue);
   }
 }
 

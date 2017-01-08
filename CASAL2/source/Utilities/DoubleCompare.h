@@ -22,6 +22,7 @@ using niwa::utilities::Double;
 #define TRUE_ZERO 0.0
 #define ZERO 1e-15
 #define DELTA 1e-11
+#define PI 3.14159265358979323846264338327950288419716939937510582097494459230781640628620899862803482534211706798214808651e+00
 
 inline bool IsZero(const Double &value) { return (value < ZERO && value > -ZERO); }
 inline bool IsTrueZero(const Double &value) { return (value < TRUE_ZERO && value > -TRUE_ZERO); }

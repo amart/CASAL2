@@ -33,6 +33,7 @@ public:
   // methods
   virtual                     ~Manager() noexcept(true) { };
   Likelihood*                 GetOrCreateLikelihood(Model* model, const string& observation_label, const string& label);
+  Likelihood*                 GetLikelihood(const string& label);
 
 protected:
   // methods

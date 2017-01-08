@@ -60,5 +60,22 @@ Likelihood* Manager::GetOrCreateLikelihood(Model* model, const string& observati
   return factory;
 }
 
+
+/**
+ * this is called in objects.cpp where we want to finda pointer to an estimate
+ */
+Likelihood* Manager::GetLikelihood(const string& label) {
+  LOG_FINEST() << "Searching for the following likelihood " << label;
+
+  for (auto likelihood : objects_) {
+    LOG_FINEST() << likelihood->label();
+    if (likelihood->label() == label) {
+      LOG_FINEST() << "Matched: " << label;
+      return likelihood;
+    }
+  }
+  return nullptr;
+}
+
 } /* namespace likelihoods */
 } /* namespace niwa */
