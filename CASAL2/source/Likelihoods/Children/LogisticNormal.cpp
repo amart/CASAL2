@@ -767,7 +767,7 @@ bool LogisticNormal::DoCholeskyDecmposition() {
 }
 
 /*
- * Invert a square matrix
+ * Invert a square boost matrix
 */
 bool LogisticNormal::InvertMatrix(const ublas::matrix<Double>& input, ublas::matrix<Double>& inverse) {
   typedef ublas::permutation_matrix<std::size_t> pmatrix;
@@ -791,7 +791,7 @@ bool LogisticNormal::InvertMatrix(const ublas::matrix<Double>& input, ublas::mat
 }
 
 /*
- * Calcuate the determinant of a square matrix
+ * Calcuate the determinant of a square boost matrix
 */
 Double LogisticNormal::det_fast(const ublas::matrix<Double>& matrix) {
   // create a working copy of the input

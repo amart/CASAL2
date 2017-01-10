@@ -61,8 +61,6 @@ protected:
   void                        SaveComparison(string category, unsigned age, Double length, Double expected, Double observed,
       Double process_error, Double error_value, Double delta, Double score);
 
-  void                        SaveComparison(unsigned year, vector<obs::Comparison> comparisons);
-
   void                        SaveComparison(string category, Double expected, Double observed,
       Double process_error, Double error_value, Double delta, Double score);
 

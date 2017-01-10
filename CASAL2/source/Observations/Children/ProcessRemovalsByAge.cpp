@@ -278,7 +278,7 @@ if ((time_step_label_.size() > 1 && last_method_time_step == current_time_step) 
          *  Apply Ageing error on Removals at age vector
          */
 
-        if (!(model_->run_mode() == RunMode::kSimulation) || ageing_error_label_ == "") {
+        if (ageing_error_label_ != "") {
           vector < vector < Double >> &mis_matrix = ageing_error_->mis_matrix();
           vector<Double> temp(Removals_at_age[year][fishery][(*category_iter)->name_].size(), 0.0);
 
@@ -318,36 +318,18 @@ if ((time_step_label_.size() > 1 && last_method_time_step == current_time_step) 
       }
     }
 
-    if (((accumulated_expected_values.size() != proportions_[model_->current_year()][category_labels_[category_offset]].size()) && !(model_->run_mode() == RunMode::kSimulation)) || ((accumulated_expected_values.size() != proportions_[model_->current_year()][category_labels_[category_offset]].size()) && ageing_error_label_ == ""))
-      LOG_CODE_ERROR() << "expected_values.size(" << accumulated_expected_values.size() << ") != proportions_[category_offset].size("
-        << proportions_[model_->current_year()][category_labels_[category_offset]].size() << ")";
-
-
     /**
      * save our comparisons so we can use them to generate the score from the likelihoods later
      */
-
     for (unsigned i = 0; i < expected_values.size(); ++i) {
       LOG_FINEST() << "-----";
-      LOG_FINEST() << "Numbers at age for all categories in age " << min_age_ + i << " = " << expected_values[i];
-
-      if (model_->run_mode() == RunMode::kSimulation && ageing_error_label_ != "") {
-
-        Double error_value = error_values_[model_->current_year()][category_labels_[category_offset]][max_age_ - min_age_];
-        Double process_error = process_errors_by_year_[model_->current_year()];
-
-        LOG_FINEST() << "Error value = " << error_value << " process error value = " << process_error << " size of error vector = " << error_values_[model_->current_year()][category_labels_[category_offset]].size() << " Min age -max-age = " << max_age_ - min_age_;
-        SaveComparison(category_labels_[category_offset], model_->min_age() + i ,0.0 ,accumulated_expected_values[i], proportions_[model_->current_year()][category_labels_[category_offset]][i],
-            process_error, error_value, delta_, 0.0);
-
-
-      } else {
-        SaveComparison(category_labels_[category_offset], min_age_ + i ,0.0 ,accumulated_expected_values[i], proportions_[model_->current_year()][category_labels_[category_offset]][i],
-              process_errors_by_year_[model_->current_year()], error_values_[model_->current_year()][category_labels_[category_offset]][i],delta_, 0.0);
-       }
-     }
-   }
- }
+      LOG_FINEST() << "Numbers at age for category: " << category_labels_[category_offset] << " for age " << min_age_ + i << " = " << accumulated_expected_values[i];
+      SaveComparison(category_labels_[category_offset], min_age_ + i, 0.0, accumulated_expected_values[i],
+      proportions_[model_->current_year()][category_labels_[category_offset]][i], process_errors_by_year_[model_->current_year()],
+      error_values_[model_->current_year()][category_labels_[category_offset]][i], delta_, 0.0);
+    }
+  }
+}
 }
 
 /**
@@ -369,130 +351,13 @@ void ProcessRemovalsByAge::CalculateScore() {
         comparison.expected_ /= total_expec;
     }
     likelihood_->SimulateObserved(comparisons_);
-    LOG_FINEST() << "simualated data";
-      if (ageing_error_label_ != "") {
-        unsigned model_age_spread = model_->age_spread();
-        LOG_FINEST() << "Applying Ageing error to simualted data.";
-        // we apply aging error here.
-        unsigned n_categories = category_labels_.size();
-        vector<vector<Double>>& mis_matrix = ageing_error_->mis_matrix();
-        LOG_FINEST() << "number of categories = " << n_categories;
-        // set up a dummy comparisons class to store information in.
-
-        for (auto& iter : comparisons_) {
-          LOG_FINEST() << " are we entering a new year?";
-          vector<observations::Comparison> Temp_comparison;
-          vector<Double> simulated_age, expected_values;
-          LOG_FINEST() << "Year = " << iter.first;
-          int store_iter = 0;
-          for (auto& comparison : iter.second) {
-            simulated_age.push_back(comparison.observed_);
-            expected_values.push_back(comparison.expected_);
-            LOG_FINEST() << "Observed value = " << comparison.observed_ << " second observed = " << simulated_age[store_iter] << " expected = " << comparison.expected_ <<  " age = " << comparison.age_ << " category = " << comparison.category_;
-            ++store_iter;
-          }
-          vector<Double> temp(simulated_age.size(), 0.0);
-          vector<Double> expected_mis(expected_values.size(), 0.0);
-          vector<Double> expected_temp(n_categories * age_spread_, 0.0), temp2(n_categories * age_spread_, 0.0);
-          // Apply ageing error
-          for(unsigned c = 0; c < n_categories; ++c) {
-            LOG_FINEST() <<"C = " << c;
-            for (unsigned i = 0; i < mis_matrix.size(); ++i) {
-              for (unsigned j = 0; j < mis_matrix[i].size(); ++j) {
-                temp[j + c * model_age_spread] += simulated_age[i + c * model_age_spread] * mis_matrix[i][j];
-                expected_mis[j + c * model_age_spread] += expected_values[i + c * model_age_spread] * mis_matrix[i][j];
-                //LOG_FINEST() << "mis_matrix[i][j] " << mis_matrix[i][j];
-              }
-            }
-          }
-          LOG_FINEST() << "size of simualted obs = " << simulated_age.size() << " rows in mis_matrix = " << mis_matrix.size() << " model spread " << model_age_spread << " age spread " << age_spread_;
-          // overwrite
-          simulated_age = temp;
-          expected_values = expected_mis;
-
-          for(auto num : expected_values) {
-              LOG_FINEST() << num;
-          }
-
-           /*
-           *  Now sum up  plus and minus group's
-           */
-          // Need to truncate the observation so that it falls within the boundaries of the observation defined.
-          LOG_FINEST() << "1st element expected = " << expected_values[0] << " 2nd = " << expected_values[1] << ", "<< expected_values[2] ;
-          for (unsigned c = 0; c < n_categories; ++c) {
-            LOG_FINEST() << "Applied ageing error, size of temp = " << temp2.size() << " plus group index = " << ((c + 1) * age_spread_) << " k will get to " << (simulated_age.size() / n_categories);
-
-
-            for(unsigned k = 0; k < (simulated_age.size() / n_categories); ++k) {
-            // this is the difference between the
-              unsigned age_offset = min_age_ - model_->min_age();
-              //minus group
-              if (((k - age_offset + min_age_) < min_age_)) {
-/*
-                LOG_FINEST () << " index = " << (k + c * (model_age_spread)) - age_offset;
-                LOG_FINEST () << " are er here " << expected_temp[(k + c * (model_age_spread)) - age_offset];
-                LOG_FINEST () << " this one " << temp2[(k + c * (model_age_spread )) - age_offset];
-                LOG_FINEST() << "Expected " <<  expected_temp[(k + c * (model_age_spread)) - age_offset] << " simulated  = "<< temp2[(k + c * (model_age_spread )) - age_offset] << " age = " << k + min_age_ << " k = " << k << " category " << category_labels_[c] << " index  = " << k + c * (model_age_spread) << " storing in "<< c * (age_spread_);
-
-                temp2[c * age_spread_] = simulated_age[k + c * (model_age_spread )];
-*/
-
-            } else if (k >= age_offset && (k - age_offset + min_age_) <= max_age_ && (k - age_offset + min_age_) >= min_age_) {
-                temp2[(k + c * (age_spread_)) - age_offset] = simulated_age[k + c * model_age_spread];
-                expected_temp[(k + c * (age_spread_)) - age_offset] = expected_values[k + c * model_age_spread ];
-                LOG_FINEST() << "Expected " <<  expected_values[k + c * model_age_spread] << " simulated  = "<< simulated_age[k + c * model_age_spread] << " age = " << k + min_age_ - age_offset << " k = " << k << " category " << category_labels_[c] << " index  = " << k + c * (model_age_spread) << " storing in "<< (k + c * (age_spread_)) - age_offset << " age offset = " << age_offset;
-              } else if (((k - age_offset + min_age_) > max_age_) && age_plus_) {
-               // plus group
-                LOG_FINEST() << "Expected " << expected_values[k + c * (model_age_spread )] << " simualted = " << simulated_age[k + c * (model_age_spread )] << " age = " << k + min_age_ - age_offset<< " k = " << k + c * (model_age_spread) << " category " << category_labels_[c] << " index  = " << k + c * (model_age_spread) << " storing in "<< ((c + 1) * age_spread_) - 1 << " age offset = " << age_offset;
-                temp2[((c + 1) * age_spread_) - 1] += simulated_age[k + c * (model_age_spread )];
-                expected_temp[((c + 1) * age_spread_) - 1] += expected_values[k + c * (model_age_spread )];
-              }
-            }
-          }
-          LOG_FINEST() << "leave this loop. size of temp2 = " << temp2.size() << " size ot temp = "  << temp.size() << " expected size = " << expected_temp.size() << " expected values = " << expected_values.size();
-
-          Double Sum_temp = 0.0;
-          for(auto num : temp2) {
-            Sum_temp += num;
-            LOG_FINEST() << num;
-          }
-          LOG_FINEST() << "Are we out, total = " << Sum_temp;
-          Double Sum_expected_temp = 0.0;
-          for(auto num : expected_temp) {
-            LOG_FINEST() << num;
-            Sum_expected_temp += num;
-          }
-
-          LOG_FINEST() <<"Sum observed after truncation = " << Sum_temp << " sum of expected " << Sum_expected_temp;
-
-          LOG_FINEST() << "Truncating observation";
-          // Now temp2 is a vector of ages for each category
-          for (unsigned c = 0; c < n_categories; ++c) {
-            for(unsigned k = 0; k < age_spread_; ++k) {
-              observations::Comparison this_comparison;
-              this_comparison.observed_ = temp2[k + c * age_spread_] / Sum_temp;
-              this_comparison.expected_ = expected_temp[k + c * age_spread_] / Sum_expected_temp;
-              this_comparison.age_ = min_age_ + k;
-              this_comparison.length_ = 0;
-              this_comparison.score_ = 0;
-              this_comparison.delta_ = delta_;
-              this_comparison.category_ = category_labels_[c];
-              this_comparison.error_value_ = error_values_[iter.first][category_labels_[c]][k];
-              this_comparison.process_error_ = process_errors_by_year_[iter.first];
-              Temp_comparison.push_back(this_comparison);
-            }
-          }
-          // save comparison
-          SaveComparison(iter.first,Temp_comparison);
-          LOG_FINEST() << "Copying new comparison";
-          iter.second = Temp_comparison;
-          for (auto& comparison : iter.second)
-           LOG_FINEST() << "expected = " << comparison.expected_ << " observed = " << comparison.observed_ << " age = " << comparison.age_ << " category = " << comparison.category_;
-          LOG_FINEST() << "Finished comparison in year " << iter.first;
-        }
-      } // If no ageing error then this issue is resolved at line 310
-
-
+    for (auto& iter : comparisons_) {
+      Double total = 0.0;
+      for (auto& comparison : iter.second)
+        total += comparison.observed_;
+      for (auto& comparison : iter.second)
+        comparison.observed_ /= total;
+    }
   } else {
     /**
      * Convert the expected_values in to a proportion
@@ -510,21 +375,18 @@ void ProcessRemovalsByAge::CalculateScore() {
       }
 
       scores_[year] = likelihood_->GetInitialScore(comparisons_, year);
-
       LOG_FINEST() << "-- Observation score calculation";
       LOG_FINEST() << "[" << year << "] Initial Score:" << scores_[year];
-    }
-
-    likelihood_->GetScores(comparisons_);
-    for (unsigned year : years_) {
+      likelihood_->GetScores(comparisons_);
       for (obs::Comparison comparison : comparisons_[year]) {
+        LOG_FINEST() << "[" << year << "]+ likelihood score: "
+            << comparison.score_;
         scores_[year] += comparison.score_;
       }
-      LOG_FINEST() << "[" << year << "] + likelihood score: " << scores_[year];
-
     }
   }
 }
+
 
 } /* namespace observations */
 } /* namespace niwa */

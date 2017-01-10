@@ -155,18 +155,6 @@ void Observation::SaveComparison(string category, unsigned age, Double length, D
 }
 
 /**
- * Save the comparison that was done during an observation in CalculateScore(), this is to overwrite an a previous comparison.
- *
- * @param year The year of the comparison
- * @param comparisons A vector of comparisons, that will overwrit
-
- */
-void Observation::SaveComparison(unsigned year, vector<obs::Comparison> comparisons) {
-  LOG_TRACE();
-  comparisons_[year] = comparisons;
-}
-
-/**
  * Save the comparison that was done during an observation to the list of comparisons. Each comparison contributes part to a score
  * and we will need to know what those parts are when reporting.
  *
