@@ -59,7 +59,7 @@ selectivities One
 type transition_category 
 from format=male,female.west.wc
 to format=male,female.west.sa	
-proportions 1.0 1.0
+proportions 0.5
 selectivities One
 
 @process Whome
@@ -94,7 +94,7 @@ ycs_values 1*5 0.426004 0.701345 0.620773 0.60283 0.457014 0.502504 0.587755 0.4
 steepness 0.75
 ssb SSB_W
 categories format=male,female.west.cr format=male,female.west.sa format=male,female.west.wc
-proportions 0.5 0.5 0.0 0.0 0.0 0.0 ## The zeros are needed if you initialise via B0
+proportions 0.25 0.25 0.0 0.0 0.0 0.0 ## The zeros are needed if you initialise via B0
 
 # male.west.sa 	male.east.cr 	male.west.cr 	male.west.wc 	male.east.cs 	female.west.sa 	female.east.cr 	female.west.cr 	female.west.wc 	female.east.cs	
 @process recruit_E

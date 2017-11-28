@@ -213,7 +213,7 @@ void ProcessRemovalsByAge::DoBuild() {
 
   // Create a pointer to misclassification matrix
     if( ageing_error_label_ != "") {
-    ageing_error_ = model_->managers().ageing_error()->GetAgeingError(ageing_error_label_);
+      ageing_error_ = model_->managers().ageing_error()->GetAgeingError(ageing_error_label_);
     if (!ageing_error_)
       LOG_ERROR_P(PARAM_AGEING_ERROR) << "(" << ageing_error_label_ << ") could not be found. Have you defined it?";
     }

@@ -381,6 +381,7 @@ pseudo
 random_draw
 random_number_seed
 random_walk
+ratio
 recruitment_beverton_holt
 recruitment_beverton_holt_with_deviations
 recruitment_constant
