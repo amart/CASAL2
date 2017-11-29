@@ -62,7 +62,6 @@ MortalityInstantaneous::MortalityInstantaneous(Model* model)
   parameters_.Bind<Double>(PARAM_M, &m_input_, "Natural mortality rates for each category", "")->set_range(0.0, 1.0);
   parameters_.Bind<Double>(PARAM_TIME_STEP_RATIO, &time_step_ratios_temp_, "Time step ratios for natural mortality", "", true);
   parameters_.Bind<string>(PARAM_SELECTIVITIES, &selectivity_labels_, "The selectivities to apply on the categories for natural mortality", "");
-  //parameters_.Bind<string>(PARAM_AGE_WEIGHT_LABELS, &age_weight_labels_, "The labels for the @age_weight block which corresponds to each category, if you want to use that weight calculation method for biomass calculations", "", "");
 
   RegisterAsAddressable(PARAM_M, &m_);
 }
@@ -357,12 +356,15 @@ void MortalityInstantaneous::DoBuild() {
     // Age Weight if it is defined
     LOG_FINEST() << "age weight " << category.age_weight_label_;
     if (category.age_weight_label_ != PARAM_NONE) {
+      LOG_FINE() << "age weight found";
       AgeWeight* age_weight = model_->managers().age_weight()->FindAgeWeight(category.age_weight_label_);
       if (!age_weight)
         LOG_ERROR_P(PARAM_METHOD) << "age weight " << category.age_weight_label_ << " does not exist. Have you defined it?";
       category.age_weight_ = age_weight;
     } else {
       category.age_weight_label_ = PARAM_NONE;
+      category.age_weight_ = nullptr;
+
     }
   }
 

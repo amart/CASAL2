@@ -328,6 +328,10 @@ void RecruitmentBevertonHolt::DoExecute() {
     /**
      * The model is not in an initialisation phase
      */
+    // get B0 if R_initialised
+    if ((model_->current_year() == model_->start_year()) & (!parameters_.Get(PARAM_B0)->has_been_defined()))
+        b0_ = derived_quantity_->GetLastValueFromInitialisation(phase_b0_);
+
     ++year_counter_;
     LOG_FINEST() << "standardise_ycs_.size(): " << standardise_ycs_.size() << "; model_->current_year(): " << model_->current_year()
         << "; model_->start_year(): " << model_->start_year();
@@ -352,10 +356,6 @@ void RecruitmentBevertonHolt::DoExecute() {
     } else {
       ycs = stand_ycs_value_by_year_[ssb_year];
     }
-
-    // Check whether B0 as an input paramter or a derived quantity, this is a result of having an r0 or a b0 in the process
-    if (!parameters_.Get(PARAM_B0)->has_been_defined())
-      b0_ = derived_quantity_->GetLastValueFromInitialisation(phase_b0_);
 
     // Calculate year to get SSB that contributes to this years recruits
     Double SSB;

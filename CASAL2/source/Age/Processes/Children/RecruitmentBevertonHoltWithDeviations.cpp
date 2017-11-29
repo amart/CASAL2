@@ -111,8 +111,6 @@ void RecruitmentBevertonHoltWithDeviations::DoValidate() {
   unsigned ycs_iter = 0;
   for (unsigned ycs_year : recruit_dev_years_) {
     recruit_dev_value_by_year_[ycs_year] = recruit_dev_values_[ycs_iter];
-    if (recruit_dev_values_[ycs_iter] < 0.0)
-        LOG_ERROR_P(PARAM_DEVIATION_YEARS) << " value " << recruit_dev_values_[ycs_iter] << " cannot be less than 0.0";
     ycs_iter++;
   }
 
@@ -308,11 +306,6 @@ void RecruitmentBevertonHoltWithDeviations::DoReset() {
   recruitment_values_.clear();
   ycs_values_.clear();
 
-  // Check whether B0 as an input paramter or a derived quantity, this is a result of having an r0 or a b0 in the process
-  // if its estimated or an input it will be updates.
-  if (!parameters_.Get(PARAM_B0)->has_been_defined())
-    b0_ = derived_quantity_->GetLastValueFromInitialisation(phase_b0_);
-
   // Only rebuild in the reset if Bmax is estimated, otherwise it remains constant.
   if (model_->managers().estimate()->HasEstimate("process[" +label_ + "].b_max")) {
     // Build Bias correction map by year 'bias_by_year_'
@@ -330,9 +323,6 @@ void RecruitmentBevertonHoltWithDeviations::DoReset() {
       }
     }
   }
-
-
-
 }
 
 /**
@@ -348,6 +338,7 @@ void RecruitmentBevertonHoltWithDeviations::DoExecute() {
     initialisationphases::Manager& init_phase_manager = *model_->managers().initialisation_phase();
     if ((init_phase_manager.last_executed_phase() <= phase_b0_) & (parameters_.Get(PARAM_R0)->has_been_defined())) {
       amount_per = r0_;
+
     } else if ((init_phase_manager.last_executed_phase() <= phase_b0_) & (parameters_.Get(PARAM_B0)->has_been_defined())) {
       if (have_scaled_partition)
         amount_per = r0_;
@@ -370,6 +361,10 @@ void RecruitmentBevertonHoltWithDeviations::DoExecute() {
     /**
      * The model is not in an initialisation phase
      */
+    // get B0 if R_initialised
+    if ((model_->current_year() == model_->start_year()) & (!parameters_.Get(PARAM_B0)->has_been_defined()))
+        b0_ = derived_quantity_->GetLastValueFromInitialisation(phase_b0_);
+
     LOG_FINEST() << "; model_->start_year(): " << model_->start_year();
     Double ycs;
     ycs = exp(recruit_dev_value_by_year_[ssb_year] - (bias_by_year_[ssb_year] * 0.5 * sigma_r_ * sigma_r_));

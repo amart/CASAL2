@@ -51,8 +51,8 @@ public:
 protected:
   // Members
   vector<unsigned>              years_;
-  unsigned                      min_age_ = 0;
-  unsigned                      max_age_ = 0;
+  unsigned                      min_age_;
+  unsigned                      max_age_;
   bool                          age_plus_ = false;
   unsigned                      age_spread_ = 0;
   parameters::Table*            obs_table_ = nullptr;

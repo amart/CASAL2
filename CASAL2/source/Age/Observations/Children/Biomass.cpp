@@ -60,10 +60,12 @@ void Biomass::DoValidate() {
         << ") is not valid. You can specify either the number of category collections (" << category_labels_.size() << ") or "
         << "the number of total categories (" << expected_selectivity_count_ << ")";
 
-  if (category_labels_.size() != age_weight_labels_.size() && expected_selectivity_count_ != age_weight_labels_.size())
-    LOG_ERROR_P(PARAM_AGE_WEIGHT_LABELS) << ": Number of age weights provided (" << age_weight_labels_.size()
-        << ") is not valid. You can specify either the number of category collections (" << category_labels_.size() << ") or "
-        << "the number of total categories (" << expected_selectivity_count_ << ")";
+  if (parameters_.Get(PARAM_AGE_WEIGHT_LABELS)->has_been_defined()) {
+    if (category_labels_.size() != age_weight_labels_.size() && expected_selectivity_count_ != age_weight_labels_.size())
+      LOG_ERROR_P(PARAM_AGE_WEIGHT_LABELS) << ": Number of age weights provided (" << age_weight_labels_.size()
+          << ") is not valid. You can specify either the number of category collections (" << category_labels_.size() << ") or "
+          << "the number of total categories (" << expected_selectivity_count_ << ")";
+  }
 
   // Delta
   if (delta_ < 0.0)
