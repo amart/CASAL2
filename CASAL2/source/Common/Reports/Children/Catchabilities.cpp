@@ -29,12 +29,11 @@ void Catchabilities::DoExecute() {
   LOG_TRACE();
   catchabilities::Manager& manager = *model_->managers().catchability();
   cache_ << "*"<< type_ << "[" << label_ << "]" << "\n";
-
+  cache_ << "values " << REPORT_R_VECTOR  << "\n";
   auto catchabilities = manager.objects();
   for (auto Q : catchabilities) {
     string label =  Q->label();
-    cache_ << "label: " << label << " " << REPORT_R_LIST << " \n";
-    cache_ << "value: " <<  AS_DOUBLE(Q->q()) << " \n";
+    cache_ << label << " " << AS_DOUBLE(Q->q())  << " \n";
   }
   ready_for_writing_ = true;
 }
