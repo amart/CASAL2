@@ -7,7 +7,7 @@
 #' @param model <casal2MPD, casal2TAB> object that are generated from one of the extract.mpd() and extract.tabular() functions.
 #' @param report_label <string> the report label containing recruitment process
 #' @param ... remaining plotting options
-#' @return generate a plot of SSBy vs Ry with the assumed Stock recruitment relationship through it.
+#' @return generate a plot of Spawning stock biomass (SSBy) vs Recruits (Ry) generated from that SSB with the assumed Stock recruitment relationship through it.
 #' @rdname plot.recruitment
 #' @export plot.recruitment
 #' @examples
