@@ -13,6 +13,7 @@
 
 // Headers
 #include "MortalityHollingRate.h"
+//#include "MortalityConstantRate.h"
 
 #include <iostream>
 
@@ -59,9 +60,11 @@ TEST_F(BasicModel, Processes_Mortality_Holling_Rate) {
   process->parameters().Add(PARAM_LABEL, "mortality", __FILE__, __LINE__);
   process->parameters().Add(PARAM_TYPE, "holling_rate", __FILE__, __LINE__);
   process->parameters().Add(PARAM_CATEGORIES, mortality_categories, __FILE__, __LINE__);
+//  process->parameters().Add(PARAM_M, "0.065", __FILE__, __LINE__);
   process->parameters().Add(PARAM_A, "1", __FILE__, __LINE__);
   process->parameters().Add(PARAM_B, "1", __FILE__, __LINE__);
-  process->parameters().Add(PARAM_X, "1", __FILE__, __LINE__);
+  process->parameters().Add(PARAM_X, "2", __FILE__, __LINE__);
+  process->parameters().Add(PARAM_U_MAX, "1", __FILE__, __LINE__);
   process->parameters().Add(PARAM_SELECTIVITIES, "constant_one", __FILE__, __LINE__);
 
   // Ageing process
@@ -93,31 +96,34 @@ TEST_F(BasicModel, Processes_Mortality_Holling_Rate) {
   for (unsigned i = 0; i < mature_female.data_.size(); ++i)
     EXPECT_DOUBLE_EQ(0.0, mature_female.data_[i]) << " where i = " << i << "; age = " << i + mature_female.min_age_;
 
+  EXPECT_DOUBLE_EQ(0.0, 5) << " where I am testing this displays when running the unit test";
+
+
   /**
    * Do 1 iteration of the model then check the categories to see if
    * the maturation was successful
    */
- model_->FullIteration();
-
-  // 1-exp(-(selectivities_[i]->GetResult(min_age + offset) * m));
-  double immature_male_value    = 60000;
-  double immature_female_value  = 40000;
-  for (unsigned i = 0; i < immature_male.data_.size() && i < 15; ++i) {
-    immature_male_value   -= (1 - exp(-0.065)) * immature_male_value;
-    immature_female_value -= (1 - exp(-0.065)) * immature_female_value;
-
-    EXPECT_DOUBLE_EQ(immature_male_value, immature_male.data_[i]) << " where i = " << i << "; age = " << i + immature_male.min_age_;
-    EXPECT_DOUBLE_EQ(immature_female_value, immature_female.data_[i]) << " where i = " << i << "; age = " << i + immature_female.min_age_;
-
-    // Checking to see output
-    EXPECT_DOUBLE_EQ(0, immature_male.data_[i]) << " where i = " << i << "; age = " << i + immature_male.min_age_;
-  }
-
-  // Mature should still be 0 because we had no maturation
-  for (unsigned i = 0; i < mature_male.data_.size(); ++i)
-    EXPECT_DOUBLE_EQ(0.0, mature_male.data_[i]) << " where i = " << i << "; age = " << i + mature_male.min_age_;
-  for (unsigned i = 0; i < mature_female.data_.size(); ++i)
-    EXPECT_DOUBLE_EQ(0.0, mature_female.data_[i]) << " where i = " << i << "; age = " << i + mature_female.min_age_;
+// model_->FullIteration();
+//
+//  // 1-exp(-(selectivities_[i]->GetResult(min_age + offset) * m));
+//  double immature_male_value    = 60000;
+//  double immature_female_value  = 40000;
+//  for (unsigned i = 0; i < immature_male.data_.size() && i < 15; ++i) {
+//    immature_male_value   -= (1 - exp(-0.065)) * immature_male_value;
+//    immature_female_value -= (1 - exp(-0.065)) * immature_female_value;
+//
+//    EXPECT_DOUBLE_EQ(immature_male_value, immature_male.data_[i]) << " where i = " << i << "; age = " << i + immature_male.min_age_;
+//    EXPECT_DOUBLE_EQ(immature_female_value, immature_female.data_[i]) << " where i = " << i << "; age = " << i + immature_female.min_age_;
+//
+//    // Checking to see output
+//    EXPECT_DOUBLE_EQ(0, immature_male.data_[i]) << " where i = " << i << "; age = " << i + immature_male.min_age_;
+//  }
+//
+//  // Mature should still be 0 because we had no maturation
+//  for (unsigned i = 0; i < mature_male.data_.size(); ++i)
+//    EXPECT_DOUBLE_EQ(0.0, mature_male.data_[i]) << " where i = " << i << "; age = " << i + mature_male.min_age_;
+//  for (unsigned i = 0; i < mature_female.data_.size(); ++i)
+//    EXPECT_DOUBLE_EQ(0.0, mature_female.data_[i]) << " where i = " << i << "; age = " << i + mature_female.min_age_;
 
 
 }
