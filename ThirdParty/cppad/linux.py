@@ -8,21 +8,19 @@ import Globals
 EX_OK = getattr(os, "EX_OK", 0)
 
 class Builder:
-  version_ = 3.11
+  version_ = 3.12
 
   def start(self):
     # Variables
-    ipOptFileName         = 'Ipopt-3.11.9'
-    cppadFileName         = 'cppad-20141128'
+    ipOptFileName         = 'Ipopt-releases-3.12.4'
+    cppadFileName         = 'CppAD-20160000.1'
     libraries = [ "libcoinblas.a", "libcoinmetis.a", "libcoinmumps.a", "libcoinlapack.a", "libipopt.a" ]
 
     # Clean our any existing files if they already exist
     print '-- Cleaning files'
     if os.path.exists(ipOptFileName):
-      # temporary, since edits were made to IpUtils.cpp
-      # os.system('chmod 777 -R ' + ipOptFileName)
-      # shutil.rmtree(ipOptFileName)
-      print 'temporarily commented out directory removal'
+      os.system('chmod 777 -R ' + ipOptFileName)
+      shutil.rmtree(ipOptFileName)
     if os.path.exists(cppadFileName):
       os.system('chmod 777 -R ' + cppadFileName)
       shutil.rmtree(cppadFileName)
@@ -36,10 +34,8 @@ class Builder:
 
     # Decompress our archive
     print '-- Decompressing IpOpt - check casal2_untar.log'
-    if os.path.exists(ipOptFileName + '.tgz'):
-      # temporary, since edits were made to IpUtils.cpp
-      # os.system('tar xvzf ' + ipOptFileName + '.tgz 1> casal2_untar.log 2>&1')
-      print 'temporarily commented out decompression'
+    if os.path.exists(ipOptFileName + '.tar.gz'):
+      os.system('tar xvzf ' + ipOptFileName + '.tar.gz 1> casal2_untar.log 2>&1')
 
     print '-- Decompressing CppAD - check casal2_unzip.log'
     if os.path.exists(cppadFileName + '.zip'):
