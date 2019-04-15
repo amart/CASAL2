@@ -6,12 +6,13 @@
 
 ################################### Minimiser ###############################
 
-@minimiser beta_diff
-type betadiff
+@minimiser cpp_ad
+type cppad
 #type numerical_differences
-iterations 4000
-tolerance 0.000002
-evaluations 10000
+# iterations 4000
+# tolerance 0.000002
+# evaluations 10000
+covariance t
 
 /*
 @minimiser num_diff

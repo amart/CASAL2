@@ -1,10 +1,10 @@
 
 @minimiser gammadiff
-type betadiff
-tolerance 0.0002
-iterations 1000
+type cppad
+# tolerance 0.0002
+# iterations 1000
 #step_size 1e-7
-covariance f
+covariance t
 active f
 
 @mcmc mcmc

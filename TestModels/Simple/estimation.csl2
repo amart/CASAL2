@@ -1,10 +1,11 @@
 ## Estimation script for HAK base model
 ## This is the -e command in CASAL
 @minimiser gammadiff
-type betadiff
-tolerance 0.00002
-iterations 500
-evaluations 1000
+type cppad
+# tolerance 0.00002
+# iterations 500
+# evaluations 1000
+covariance t
 
 @mcmc mcmc
 start 0

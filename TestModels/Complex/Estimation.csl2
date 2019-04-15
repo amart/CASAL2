@@ -5,11 +5,12 @@
 # - Define AdditionalPriors = Analogous to Penalties really.
 
 ################################### Minimiser ###############################
-@minimiser beta_diff
-type betadiff
-tolerance 1e-6
-iterations 2500
-evaluations 4000
+@minimiser cpp_ad
+type cppad
+# tolerance 1e-6
+# iterations 2500
+# evaluations 4000
+covariance t
 
 
 ################################### Estimates ###############################
