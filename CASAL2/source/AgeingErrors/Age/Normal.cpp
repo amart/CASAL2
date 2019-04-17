@@ -33,8 +33,8 @@ Double NormalCDF(Double x, Double mu, Double sigma) {
   else if (sigma <= 0.0 && x >= mu)
     return 1;
 
-  boost::math::normal s(AS_DOUBLE(mu), AS_DOUBLE(sigma));
-  return cdf(s, AS_DOUBLE(x));
+  boost::math::normal s(AS_VALUE(mu), AS_VALUE(sigma));
+  return cdf(s, AS_VALUE(x));
 }
 
 
