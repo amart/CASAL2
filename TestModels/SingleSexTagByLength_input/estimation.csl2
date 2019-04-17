@@ -1,11 +1,11 @@
 
-@minimiser gammadiff
+@minimiser CPPAD
 type cppad
+active true
 # tolerance 0.0002
 # iterations 1000
 #step_size 1e-7
-covariance t
-active f
+covariance true
 
 @mcmc mcmc
 start 0

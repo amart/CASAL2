@@ -1,9 +1,10 @@
-@minimiser gammadiff
+@minimiser CPPAD
 type cppad
+active true
 # tolerance 0.000002
 # iterations 1000
 #step_size 1e-7
-covariance t
+covariance true
 
 #@minimiser dlib
 #type dlib

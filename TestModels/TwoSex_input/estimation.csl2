@@ -1,9 +1,10 @@
 ## Estimation script for LIN3&4 base model (2014 assessment)
-@minimiser gammdiff
+@minimiser CPPAD
 type cppad
+active true
 # tolerance 0.00002
 # iterations 1000
-covariance t
+covariance true
 
 @mcmc mcmc
 start 0

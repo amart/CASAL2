@@ -5,12 +5,13 @@
 # - Define AdditionalPriors = Analogous to Penalties really.
 
 ################################### Minimiser ###############################
-@minimiser cpp_ad
+@minimiser CPPAD
 type cppad
+active true
 # tolerance 1e-3
 # iterations 2500
 # evaluations 4000
-covariance t
+covariance true
 
 
 ################################### Estimates ###############################
@@ -323,7 +324,7 @@ upper_bound 44
 ################################### Penalties ###############################
 @penalty CatchMustBeTaken
 type process
-log_scale True
+log_scale true
 multiplier 10000
 
 ################################### Additional Priors ###############################

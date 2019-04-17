@@ -6,13 +6,14 @@
 
 ################################### Minimiser ###############################
 
-@minimiser cpp_ad
+@minimiser CPPAD
 type cppad
+active true
 #type numerical_differences
 # iterations 4000
 # tolerance 0.000002
 # evaluations 10000
-covariance t
+covariance true
 
 /*
 @minimiser num_diff
@@ -118,7 +119,7 @@ upper_bound 1.0
 ################################### Penalties ###############################
 @penalty CatchMustBeTaken
 type process
-log_scale True
+log_scale true
 multiplier 100
 
 ################################### Additional Priors ########################
