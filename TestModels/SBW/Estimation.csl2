@@ -1,4 +1,4 @@
-## Structure of my estimation.csl2 
+## Structure of my estimation.csl2
 # - Define Minimiser along with subcommands such as gradient tolerance to stop, how many evaluations to stop at etc.
 # - Define Estimates = Parameters being estiamted with assumed priors and bounds
 # - Define Penalties = Additional Penalties assumed on these models
@@ -6,13 +6,13 @@
 
 ################################### Minimiser ###############################
 
-@minimiser CPPAD
-type cppad
+@minimiser BETADIFF
+type betadiff
 active true
 #type numerical_differences
-# iterations 4000
-# tolerance 0.000002
-# evaluations 10000
+iterations 4000
+tolerance 0.000002
+evaluations 10000
 covariance true
 
 /*
@@ -130,7 +130,7 @@ multiplier 100
 type vector_average
 parameter process[Recruitment].ycs_values
 k 1
-multiplier 1		
+multiplier 1
 
 #######
 ## Q's
@@ -139,6 +139,6 @@ multiplier 1
 type lognormal
 parameter catchability[TangaroaMatureq].q
 mu 0.54
-cv 0.44		
+cv 0.44
 
 ## don't need to add a uniform prior for the other q as- it's not a true estiamte so has a null contribution.

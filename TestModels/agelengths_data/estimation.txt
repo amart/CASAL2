@@ -1,8 +1,8 @@
-@minimiser CPPAD
-type cppad
+@minimiser BETADIFF
+type betadiff
 active true
-# tolerance 0.000002
-# iterations 1000
+tolerance 0.000002
+iterations 1000
 #step_size 1e-7
 covariance true
 

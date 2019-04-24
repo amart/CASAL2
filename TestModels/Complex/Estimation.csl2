@@ -1,16 +1,16 @@
-## Structure of my estimation.csl2 
+## Structure of my estimation.csl2
 # - Define Minimiser along with subcommands such as gradient tolerance to stop, how many evaluations to stop at etc.
 # - Define Estimates = Parameters being estiamted with assumed priors and bounds
 # - Define Penalties = Additional Penalties assumed on these models
 # - Define AdditionalPriors = Analogous to Penalties really.
 
 ################################### Minimiser ###############################
-@minimiser CPPAD
-type cppad
+@minimiser BETADIFF
+type betadiff
 active true
-# tolerance 1e-6
-# iterations 2500
-# evaluations 4000
+tolerance 1e-6
+iterations 2500
+evaluations 4000
 covariance true
 
 
@@ -146,13 +146,13 @@ upper_bound 0.30
 @estimate M_male_y1
 parameter selectivity[M_male].y1
 type uniform
-lower_bound 0.5 
+lower_bound 0.5
 upper_bound 2.0
 
 @estimate M_male_y2
 parameter selectivity[M_male].y2
 type uniform
-lower_bound 0.5 
+lower_bound 0.5
 upper_bound 2.0
 
 # female
@@ -171,13 +171,13 @@ upper_bound 0.30
 @estimate M_female_y1
 parameter selectivity[M_female].y1
 type uniform
-lower_bound 0.5 
+lower_bound 0.5
 upper_bound 2.0
 
 @estimate M_female_y2
 parameter selectivity[M_female].y2
 type uniform
-lower_bound 0.5 
+lower_bound 0.5
 upper_bound 2.0
 
 ## Western Home Migration
@@ -224,7 +224,7 @@ upper_bound 1 1 1 1 1 1 1 1
 @estimate Enspsl_mu
 parameter selectivity[Enspsl].mu
 type uniform
-lower_bound 64 
+lower_bound 64
 upper_bound 84
 
 @estimate Enspsl_s_l
@@ -243,7 +243,7 @@ upper_bound 44
 @estimate Wnspsl_mu
 parameter selectivity[Wnspsl].mu
 type uniform
-lower_bound 64 
+lower_bound 64
 upper_bound 84
 
 @estimate Wnspsl_s_l
@@ -264,7 +264,7 @@ upper_bound 44
 parameter selectivity[Espsl].a50
 same selectivity[Wspsl].a50
 type uniform
-lower_bound 6 
+lower_bound 6
 upper_bound 80
 
 @estimate Espsl_ato95
@@ -287,7 +287,7 @@ upper_bound 2.24
 @estimate CRsl_mu
 parameter selectivity[CRsl].mu
 type uniform
-lower_bound 64 
+lower_bound 64
 upper_bound 84
 
 @estimate CRsl_s_l
@@ -306,7 +306,7 @@ upper_bound 44
 @estimate SAsl_mu
 parameter selectivity[SAsl].mu
 type uniform
-lower_bound 64 
+lower_bound 64
 upper_bound 84
 
 @estimate SAsl_s_l
@@ -350,7 +350,7 @@ second_parameter selectivity[sel_Wspmg_Male].values{8}
 multiplier 100
 
 ## The old HOKI user Defined penalty is actually just a log_normal evaluation of specific age based selectivities
-# Have generalised prior_penalty_Mprior3.cpp which is from Patrick's report, WG-HOK-2007/11, 
+# Have generalised prior_penalty_Mprior3.cpp which is from Patrick's report, WG-HOK-2007/11,
 # mu = -1.817 sd = 0.48
 # we can translate this into a log_mean and cv via the following
 # mnM= exp(-1.817 + 0.5 * pow(0.48,2));
