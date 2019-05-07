@@ -591,6 +591,7 @@ m 1.0 1.0
 \end{verbatim}}}
 
 In the above syntax you can see how you set \subcommand{m} to zero and allow the rate to be described through the selectivity. This concept can be applied in other mortality methods such as \subcommand{instantaneous\_mortality}.
+
 \paragraph{Event and biomass-event mortality}
 
 The event mortality\index{Event mortality} and biomass-event mortality\index{Biomass-event mortality} processes act in a similar manner, except that they remove a specified abundance (number of individuals) or biomass respectively. These can be used to include anthropogenic mortality where numbers of removals are known, e.g. fishing in a fisheries model, rather than applying mortality as a rate. 
@@ -622,7 +623,7 @@ And the number removed $R$ from each age $a$ in category $j$ is,
   R(a,j) = UV(a,j)
 \end{equation}
 
-For example, to specify an \textbf{abundance based} fishing mortality process in a fisheries model, with catches given for a set of specific years, over categories `immature' and 'mature', with selectivity `FishingSel', and assuming a maximum possible exploitation rate of 0.7, the syntax is,
+For example, to specify an \textbf{abundance based} fishing mortality process in a fisheries model, with catches given for a set of specific years, over categories 'immature' and 'mature', with selectivity 'FishingSel', and assuming a maximum possible exploitation rate of 0.7, the syntax is,
 
 {\small{\begin{verbatim}
 	@process Fishing
@@ -645,7 +646,8 @@ and specifed similarly for a \textbf{biomass} based fishing mortality process,
 		selectivities FishingSel FishingSel
 		penalty event_mortality_penalty
 		\end{verbatim}}}
-\paragraph{Instantaneous mortality}
+
+\paragraph{Instantaneous mortality}\label{subsubsec:instantaneous-mortality}
 
 The instantaneous mortality process\index{Instantaneous mortality} combines both natural mortality and event biomass mortality into a single process. This allows the simultaneous application of both natural mortality and anthropogenic mortality to occur across multiple time steps. This process applies half the natural mortality in each time step, then the mortalities from all the concurrent removals instantaneously, then the remaining half of the natural mortality. In fisheries models this is the most commonly used mortality process. It allows for multiple removal events in the case of a fisheries model multiple fisheries/fleets. There are a few constraints that a removal method can only occur in one time step, but you can have multiple removals to cover events during the year.
 
@@ -719,6 +721,94 @@ FishingWest   stock     westFSel    0.7     step1     CatchPenalty
 FishingEast   stock     eastFSel    0.7     step1     CatchPenalty
 end_table		
 \end{verbatim}}}
+
+\paragraph{Instantaneous mortality with retained catch and discards}
+
+This process builds on the instantaneous mortality process (\ref{subsubsec:instantaneous-mortality}) which has simultaneous applications of fishing and natural
+mortality, but with all catch-at-sea being landed, i.e., no discarding. The process \texttt{mortality\_instantaneous\_retained} allows for retained catch, discards, and also a mortality to be applied to discards, i.e., some are allowed to survive. The method for taking catch from the partition and constraints used are the same as in \texttt{mortality\_instantaneous}.
+
+The process was created to solve problems in the pot fishery for blue cod which has a minimum legal size and so some catch must be discarded at sea and some of these discards are expected to survive (based on some experimental work). There are length data taken at sea so that the catch selectivity can be estimated, and length and age data from the landed catch (retained) so that the retention selectivity can also be estimated. In this version of the process, discard mortality is specified by the user by defining a selectivity to represent mortality by age or length (e.g., constant of reverse logistic) and it is intended that it would not be estimated since there is no observation class for it yet. If discard mortality is not provided, it is assumed that all discards die. Landed catch, and both retained and catch selectivites must be specified.
+
+Extending the example shown in instantaneous mortality process (\ref{subsubsec:instantaneous-mortality}) to use retained weight instead of catch, the input commands would be:
+
+{\small{\begin{verbatim}
+	@process FishingRetainedCatch
+	type mortality_instantaneous_retained
+	m 0.20
+	#natural mortality
+	time_step_ratio 0.42 0.25 0.33 # ratio of natural mortality in each of the tree time steps
+	selectivities One
+	#for natural mortality by age
+	categories male female
+	units kgs
+
+	table catches # two fisheries, West and East
+	year FishingWest FishingEast
+	1975 80000 111000 # these are now landed catch
+	1976 152000 336000
+	1977 74000 1214000
+	end table
+
+	table method #all discards die
+	method
+	category selectivity retained_selectivity u_max time_step penalty
+	FishingWest stock westFSel westRetainedSel 0.7 step1 CatchPenalty
+	FishingEast stock eastFSel eastRetainedSel 0.7 step1 CatchPenalty
+	end_table
+	\end{verbatim}}}
+
+If discard mortality is less than 1.0 is required, then use:
+
+{\small{\begin{verbatim}
+	table method # 50% discard mortality
+	method category selectivity retained_selectivity discard_mortality u_max time_step penalty
+	FishingWest stock westFSel westRetainedSel DisMort 0.7 step1 CatchPenalty
+	FishingEast stock eastFSel eastRetainedSel DisMort 0.7 step1 CatchPenalty
+	end_table
+
+	@selectivity DisMort
+	Type constant
+	c 0.5 #50% mortality of discards returned to the sea
+	\end{verbatim}}}
+
+See instantaneous mortality process (\ref{subsubsec:instantaneous-mortality}) for referencing catch parameters and calculating weight using empirical weight by age matrices.
+
+The report gives total catch, actual landed catch, and discards, without and with discard mortality; use the following
+
+{\small{\begin{verbatim}
+	@report Mortality
+	type process
+	process Instantaneous_Mortality_Retained
+	\end{verbatim}}}
+
+In the following, fisheries are indexed by $f$, and $a$ indexes both age and category combinations.
+
+The total catch is found using by using a selectivity, $S_{f,a}$, in the same way as in the instantaneous mortality process. Retention, $R_{f,a}$, is defined by specifying a selectivity and it can be a function of length or age. The retained catch is the product of these two values, $R_{f,a} \ S_{f,a}$. If sex is in the partition, then there are potentially two retention curves, one for each sex. In general, there is a retention curve for each category in the partition. It does not apply to surveys. Discard mortality is also specified as a selectivity, $D_{f,a}$. The fraction of dead fish from fishing activity is $S_{f,a} * ( R_{f,a} + (1.0 - R_{f,a} ) * D_{f,a} )$. If $D_{f,a}$ is 1.0, then all selected fish are dead, but if it is 0.0, then only retained fish are dead.
+
+When the \texttt{mortality\_instantaneous\_retained} process is applied, the following equations are used:
+
+\begin{itemize}
+	\item Total catch (catch-on-board), $C_{f}$, is calculated by VF/VR*(retained catch), where VF is vulnerable retained biomass, $j$ indexes categories and $t$ is the proportion of M in the time-step, and VF is the full vulnerable biomass, $VF = \sum_{a,j} \overline{w}_{a} S_{a,j} N_{a,j} \exp(-0.5 t M_{a,j})}$.
+	
+	\item An exploitation rate (actually a proportion) is calculated for each fishery, as the total catch (retained + discards) divided by the selected biomass (VF above) using selectivity $S_{f,a}$,
+		$$ U_f = \frac{C_f}{\sum_a \bar{w}_aS_{f,a}n_a \exp(-0.5 t M_{a})}$$
+	
+	\item The mortality pressure associated with method $f$ is defined as the maximum proportion of fish taken from any element of the partition in the area affected by the method $f$,
+		$$ U_{f,obs} = max_a(\sum_k S_{k,a}U_k) $$
+	where the maximum is over all partition elements affected by fishery $f$, and the summation is over all methods $k$ which affect the $j$th partition element in the same time step as fishery $f$.
+
+	In most cases the mortality pressure will be equal to the exploitation rate (i.e., $U_{f,obs} = U_f$), but can be different if: (a) there is another removal method operating in the same time step as removal method $f$ and affecting some of the same partition elements, and/or (b) the selectivity $S_{f,a}$ does not have a maximum value of 1.
+
+	There is a maximum mortality pressure limit of $U_{f,max}$ for each method of removal $f$. So, no more than proportion $U_{f,max}$ can be taken from any element of the partition affected by removal method $f$ in that time step. Clearly, $0 \leq U_{max} \leq 1$. It is an error if two removal methods, which affect the same partition elements in the same time step, do not have the same $U_max$.
+
+	For each $f$, if $U_{f,obs} > U_{f,max}$, then $U_f$ is multiplied by $U_{f,max}/U_{f,obs}$ and the mortality pressures are recalculated. In this case the catch actually taken from the population in the model will differ from the specified catch, $C_f$.
+
+	\item Discard numbers-at-age (including their share of natural mortality) is $S_{a,j} (1 - R_{a,j}) N_{a,j} \exp(-0.5 t M_{a,j})$, and those that die at the end of the time step (updating the partition) are $D_{a,j} S_{a,j} (1 - R_{a,j}) N_{a,j} \exp(-t M_{a,j})$, where $D_{f,a}$ is the fraction that die on return to the sea.
+
+	\item The partition is updated by removing landed catch, natural mortality, and discard mortality
+		$$ N'_{a} = N_{a} \exp(-t M_a) \big[ 1 - \sum_f S_{f,a} U_f (R_{f,a} + D_{f,a} (1 - R_{f,a}) \big] $$
+\end{itemize}
+
 
 \paragraph{Holling's mortality rate}
 
